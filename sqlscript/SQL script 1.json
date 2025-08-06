@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 1",
+	"properties": {
+		"content": {
+			"query": "select * from sys.databases;\nselect * from sys.external_data_sources;\n\nDROP DATABASE [appdb];\n\nCREATE DATABASE [appdb];\n\nCREATE MASTER KEY ENCRYPTION BY PASSWORD = 'P@ssword@123';\n\nCREATE DATABASE SCOPED CREDENTIAL sasToken\nWITH\n    IDENTITY = 'SHARED ACCESS SIGNATURE',\n    SECRET = 'sp=r&st=2025-08-06T12:32:19Z&se=2025-09-05T20:47:19Z&spr=https&sv=2024-11-04&sr=c&sig=ZQuTKZvu5eS1C1sgz74k1jCt73crQ1b5oL6oD3U5XW4%3D'\n;\n\nCREATE EXTERNAL DATA SOURCE srcActivityLog\nWITH \n(\n    LOCATION = 'https://datalakestorede.blob.core.windows.net/data',\n    CREDENTIAL = sasToken\n)\n;\n\nCREATE EXTERNAL FILE FORMAT delimitedTxtFileFormat\nWITH\n(\n    FORMAT_TYPE = DELIMITEDTEXT,\n    FORMAT_OPTIONS(\n        FIELD_TERMINATOR = ',',\n        FIRST_ROW = 2\n\n    )\n)\n;\n\nCREATE EXTERNAL TABLE ActivityLog\n(\n   [Correlationid] varchar(200),\n   [Operationname] varchar(300),\n   [Status] varchar(100),\n   [Eventcategory] varchar(100),\n   [Level] varchar(100),\n   [Time] varchar(100),\n   [Subscription] varchar(200),\n   [Eventinitiatedby] varchar(1000),\n   [Resourcetype] varchar(300),\n   [Resourcegroup] varchar(1000),\n   [Resource] varchar(2000)\n)\nWITH (\n    LOCATION = '/ActivityLog01.csv',\n    DATA_SOURCE = srcActivityLog,\n    FILE_FORMAT = delimitedTxtFileFormat\n)\n;\n\nSELECT TOP 10 * FROM ActivityLog;\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "appdb",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
